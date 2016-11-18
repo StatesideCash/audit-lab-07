@@ -21,8 +21,6 @@ char* get_input() {
     char c;
     scanf("%c", &c);
 
-    //TODO Handle 0 byte input
-    //TODO Check for input == NULL and errno == ENOMEM for allocation failures
     //Allocate a buffer for the new size and store the new string in it
     do {
         input = reallocf(input, i+2); //+2 accounts for null byte
@@ -98,6 +96,7 @@ int check_creditcard(char* cc) {
 
     //Run regex
     ret = regexec(&regex, cc, 0, NULL, 0);
+    regfree(regex);
     if (!ret) {
         printf("CC - Success\n"); //TODO Remove
         return 0;
@@ -140,6 +139,7 @@ int check_expiry(char* exp) {
 
     //Run regex
     ret = regexec(&regex, exp, 0, NULL, 0);
+    regfree(regex);
     if (!ret) {
         printf("EXP - Success\n"); //TODO Remove
         return 0;
@@ -181,6 +181,7 @@ int check_zipcode(char* zipcode) {
 
     //Run regex
     ret = regexec(&regex, zipcode, 0, NULL, 0);
+    regfree(regex);
     if (!ret) {
         printf("ZIP - Success\n"); //TODO Remove
         return 0;
@@ -213,7 +214,8 @@ int check_dollars(char* dollars) {
     int ret;
 
     //Compile regex
-    ret = regcomp(&regex, "$", REG_EXTENDED);
+    //TODO This has a bug. Idk yet :/
+    ret = regcomp(&regex, "^(\\$)([[:digit:]])+|^(\\$)([[:digit:]])+(\\.[[:digit:]][[:digit:]])", REG_EXTENDED);
     if (ret) {
         printf("DOLLARS REGEX FAILED TO COMPILE!\n");
         printf("Are you running on a modern POSIX system with support for extended regex?\n");
@@ -222,6 +224,7 @@ int check_dollars(char* dollars) {
 
     //Run regex
     ret = regexec(&regex, dollars, 0, NULL, 0);
+    regfree(regex);
     if (!ret) {
         printf("Dollars - Success\n"); //TODO Remove
         return 0;
@@ -235,6 +238,47 @@ int check_dollars(char* dollars) {
     }
 }
 
+/**
+ * int check_email(char* email)
+ * Checks for valid email format
+ *
+ * Args
+ * * email - The email to check
+ * Returns: 0 on success, 1 on failure
+ */
+int check_email(char* email) {
+    if (check_blank(email)) { 
+        printf("Blank email.\n");
+        return 1;
+    }
+    
+    //Variables for use with regex
+    regex_t regex;
+    int ret;
+
+    //Compile regex
+    //TODO
+    ret = regcomp(&regex, "", REG_EXTENDED);
+    if (ret) {
+        printf("EMAIL REGEX FAILED TO COMPILE!\n");
+        printf("Are you running on a modern POSIX system with support for extended regex?\n");
+        return 0; //Prevent infinite loop if the regex fails
+    }
+
+    //Run regex
+    ret = regexec(&regex, dollars, 0, NULL, 0);
+    regfree(regex);
+    if (!ret) {
+        printf("Email - Success\n"); //TODO Remove
+        return 0;
+    } else if (ret == REG_NOMATCH) {
+        printf("Invalid email format.\n");
+        return 1;
+    } else {
+        printf("Error with the regex\n");
+        return 0;
+    }
+}
 
 /**
  * int main()
@@ -246,6 +290,7 @@ int main() {
     //signal(SIGSEGV, ignore_crash);
     //</joke>
 
+    //First and last name
     char* name;
     do {
         printf("Enter a first name and last name: ");
@@ -253,6 +298,7 @@ int main() {
     } while (check_name(name));
     printf("Name: %s\n", name); //TODO Remove
 
+    // Credit Card Number
     char* ccnum;
     do {
         printf("Enter a credit card #: ");
@@ -260,6 +306,7 @@ int main() {
     } while (check_creditcard(ccnum));
     printf("CC: %s\n", ccnum); //TODO Remove
 
+    //Expiry date
     char* exp;
     do {
         printf("Enter an expiration number: ");
@@ -267,6 +314,7 @@ int main() {
     } while (check_expiry(exp));
     printf("ExpDate: %s\n", exp); //TODO Remove
 
+    //Zipcode
     char* zipcode;
     do {
         printf("Enter a zip code: ");
@@ -274,6 +322,7 @@ int main() {
     } while (check_zipcode(zipcode));
     printf("ZIP: %s\n", zipcode);
 
+    //Dollars
     char* dollars;
     do {
         printf("Enter a valid purchase amount in dollars: ");
@@ -281,10 +330,15 @@ int main() {
     } while (check_dollars(dollars));
     printf("Dollars: %s\n", dollars); //TODO Remove
 
-    printf("Enter a valid email address: ");
-    char* email = get_input();
+    //Email
+    char* email;
+    do {
+        printf("Enter a valid email address: ");
+        email = get_input();
+    } while (check_email(email));
     printf("Email: %s\n", email); //TODO Remove
 
+    //Free all the allocated data for shits and giggles
     if (name != NULL) {
         free(name);
     }
