@@ -97,7 +97,6 @@ int check_creditcard(char* cc) {
     }
 
     //Run regex
-    //TODO Check regex error return for invalid match
     ret = regexec(&regex, cc, 0, NULL, 0);
     if (!ret) {
         printf("CC - Success\n"); //TODO Remove
@@ -112,6 +111,130 @@ int check_creditcard(char* cc) {
         return 0;
     }
 }
+
+/**
+ * int check_expiry(char* exp)
+ * Checks for a valid format CC exp date
+ *
+ * Args
+ * * exp - The expiry date to check
+ * Returns: 0 on success, 1 on failure
+ */
+int check_expiry(char* exp) {
+    if (check_blank(exp)) { 
+        printf("Blank expiry date.\n");
+        return 1;
+    }
+    
+    //Variables for use with regex
+    regex_t regex;
+    int ret;
+
+    //Compile regex
+    ret = regcomp(&regex, "([[:digit:]]){2}/([[:digit:]]){2}/([[:digit:]]){4}", REG_EXTENDED);
+    if (ret) {
+        printf("EXPIRY REGEX FAILED TO COMPILE!\n");
+        printf("Are you running on a modern POSIX system with support for extended regex?\n");
+        return 0; //Prevent infinite loop if the regex fails
+    }
+
+    //Run regex
+    ret = regexec(&regex, exp, 0, NULL, 0);
+    if (!ret) {
+        printf("EXP - Success\n"); //TODO Remove
+        return 0;
+    } else if (ret == REG_NOMATCH) {
+        printf("Invalid expiry format.\n");
+        printf("Format: MM/DD/YYYY\n");
+        return 1;
+    } else {
+        printf("Error with the regex\n");
+        return 0;
+    }
+}
+
+/**
+ * int check_zipcode(char* zipcode)
+ * Checks for a valid zipcode, in short or extended form
+ *
+ * Args
+ * * zipcode - The zipcode to check
+ * Returns: 0 on success, 1 on failure
+ */
+int check_zipcode(char* zipcode) {
+    if (check_blank(zipcode)) { 
+        printf("Blank zipcode.\n");
+        return 1;
+    }
+    
+    //Variables for use with regex
+    regex_t regex;
+    int ret;
+
+    //Compile regex
+    ret = regcomp(&regex, "([[:digit:]]){5}|([[:digit:]]){5}-([[:digit:]]){4}", REG_EXTENDED);
+    if (ret) {
+        printf("ZIPCODE REGEX FAILED TO COMPILE!\n");
+        printf("Are you running on a modern POSIX system with support for extended regex?\n");
+        return 0; //Prevent infinite loop if the regex fails
+    }
+
+    //Run regex
+    ret = regexec(&regex, zipcode, 0, NULL, 0);
+    if (!ret) {
+        printf("ZIP - Success\n"); //TODO Remove
+        return 0;
+    } else if (ret == REG_NOMATCH) {
+        printf("Invalid zipcode format.\n");
+        printf("Format: 12345 OR 12345-5678\n");
+        return 1;
+    } else {
+        printf("Error with the regex\n");
+        return 0;
+    }
+}
+
+/**
+ * int check_dollars(char* dollars)
+ * Ensures the entered value is a valid monetary amount in USD.
+ *
+ * Args
+ * * dollars - The amount of money to check
+ * Returns: 0 on success, 1 on failure
+ */
+int check_dollars(char* dollars) {
+    if (check_blank(dollars)) { 
+        printf("Blank dollars value.\n");
+        return 1;
+    }
+    
+    //Variables for use with regex
+    regex_t regex;
+    int ret;
+
+    //Compile regex
+    ret = regcomp(&regex, "$", REG_EXTENDED);
+    if (ret) {
+        printf("DOLLARS REGEX FAILED TO COMPILE!\n");
+        printf("Are you running on a modern POSIX system with support for extended regex?\n");
+        return 0; //Prevent infinite loop if the regex fails
+    }
+
+    //Run regex
+    ret = regexec(&regex, dollars, 0, NULL, 0);
+    if (!ret) {
+        printf("Dollars - Success\n"); //TODO Remove
+        return 0;
+    } else if (ret == REG_NOMATCH) {
+        printf("Invalid monetary format.\n");
+        printf("Format: $123.45\n");
+        return 1;
+    } else {
+        printf("Error with the regex\n");
+        return 0;
+    }
+}
+
 
 /**
  * int main()
@@ -137,17 +260,25 @@ int main() {
     } while (check_creditcard(ccnum));
     printf("CC: %s\n", ccnum); //TODO Remove
 
-
-    printf("Enter an expiration number: ");
-    char* exp = get_input();
+    char* exp;
+    do {
+        printf("Enter an expiration number: ");
+        exp = get_input();
+    } while (check_expiry(exp));
     printf("ExpDate: %s\n", exp); //TODO Remove
 
-    printf("Enter a zip code: ");
-    char* zipcode = get_input();
+    char* zipcode;
+    do {
+        printf("Enter a zip code: ");
+        zipcode = get_input();
+    } while (check_zipcode(zipcode));
     printf("ZIP: %s\n", zipcode);
 
-    printf("Enter a valid purchase amount in dollars: ");
-    char* dollars = get_input();
+    char* dollars;
+    do {
+        printf("Enter a valid purchase amount in dollars: ");
+        dollars = get_input();
+    } while (check_dollars(dollars));
     printf("Dollars: %s\n", dollars); //TODO Remove
 
     printf("Enter a valid email address: ");
