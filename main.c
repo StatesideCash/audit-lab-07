@@ -96,7 +96,7 @@ int check_creditcard(char* cc) {
 
     //Run regex
     ret = regexec(&regex, cc, 0, NULL, 0);
-    regfree(regex);
+    regfree(&regex);
     if (!ret) {
         printf("CC - Success\n"); //TODO Remove
         return 0;
@@ -139,7 +139,7 @@ int check_expiry(char* exp) {
 
     //Run regex
     ret = regexec(&regex, exp, 0, NULL, 0);
-    regfree(regex);
+    regfree(&regex);
     if (!ret) {
         printf("EXP - Success\n"); //TODO Remove
         return 0;
@@ -181,7 +181,7 @@ int check_zipcode(char* zipcode) {
 
     //Run regex
     ret = regexec(&regex, zipcode, 0, NULL, 0);
-    regfree(regex);
+    regfree(&regex);
     if (!ret) {
         printf("ZIP - Success\n"); //TODO Remove
         return 0;
@@ -224,7 +224,7 @@ int check_dollars(char* dollars) {
 
     //Run regex
     ret = regexec(&regex, dollars, 0, NULL, 0);
-    regfree(regex);
+    regfree(&regex);
     if (!ret) {
         printf("Dollars - Success\n"); //TODO Remove
         return 0;
@@ -266,8 +266,8 @@ int check_email(char* email) {
     }
 
     //Run regex
-    ret = regexec(&regex, dollars, 0, NULL, 0);
-    regfree(regex);
+    ret = regexec(&regex, email, 0, NULL, 0);
+    regfree(&regex);
     if (!ret) {
         printf("Email - Success\n"); //TODO Remove
         return 0;
