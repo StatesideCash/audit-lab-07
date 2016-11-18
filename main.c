@@ -46,10 +46,44 @@ int main() {
     printf("Enter a first name and last name: ");
     char* name = get_input();
 
+    printf("Enter a credit card #: ");
+    char* ccnum = get_input();
+
+    printf("Enter an expiration number: ");
+    char* exp = get_input();
+
+    printf("Enter a zip code: ");
+    char* zipcode = get_input();
+
+    printf("Enter a valid purchase amount in dollars: ");
+    char* dollars = get_input();
+
+    printf("Enter a valid email address: ");
+    char* email = get_input();
+
 
     if (name != NULL) {
         free(name);
     }
 
+    if (ccnum != NULL) {
+        free(ccnum);
+    }
+
+    if (exp != NULL) {
+        free(exp);
+    }
+
+    if (zipcode != NULL) {
+        free(zipcode);
+    }
+
+    if (dollars != NULL) {
+        free(dollars);
+    }
+
+    if (email != NULL) {
+        free(email);
+    }
     return 0; 
 }
