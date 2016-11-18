@@ -1,4 +1,4 @@
-CC=clang
+CC=afl-clang
 CFLAGS= -std=c99 -pedantic -Wall -Werror -g
 
 clean:
